@@ -3,24 +3,47 @@ var ObjectID = require('mongodb').ObjectID;
 function employeeModel(db){
   var lib = {};
   var empColl = db.collection('emps');
+
   lib.getEmployees = (handler)=>{
-    // implementar
-    // obtener todos los documentos
+      obt.find({}).toArray(
+        (err , docs) => {
+          if(err){
+            handler(err, null);
+          }else{
+            handler(null, docs);
+          }
+        }
+       ); 
+  } 
+
     return handler(new Error("No Implementado"), null);
   }
 
   lib.getEmployeesById = (id, handler) => {
-    // implementar
-    // Obtener un Documento solo mostrar
-    // email, phone, name y age
+    obt.findOne({ "_id": new ObjectId(thingId)}, (err, doc)=>{
+      if(err){
+        handler(err, null);
+      }else{
+        handler(null, doc);
+      }
+    }); // 
+} // 
+
     return handler(new Error("No Implementado"), null);
-  }
+  
 
   lib.getEmployeesByCompany = (company, handler) => {
-    // implementar
-    // solo mostrar name, email, company
+    obt.insertOne(company, (err, r)=>{
+      if(err){
+        handler(err, null);
+      }else{
+        handler(null, r.result);
+      }
+    }); //insert One
+  }// addNewThing
+
     return handler(new Error("No Implementado"), null);
-  }
+  
 
   lib.getEmployeesByAgeRange = (ageLowLimit, ageHighLimit, handler) => {
     //implementar
@@ -32,34 +55,78 @@ function employeeModel(db){
   }
 
   lib.getEmployeesByTag = (tag, handler) => {
-    //implementar
-    // obtener todos los documentos que contenga 
-    // al menos una vez el tag dentro del arreglo
-    // tags
-    // mostrar solo name, email, tags
+    obt.findOne({ "_id": new ObjectId(companyID)}, (err, doc)=>{
+      if(err){
+        handler(err, null);
+      }else{
+        handler(null, doc);
+      }
+    }); // findOne
+} // getThingById
     return handler(new Error("No Implementado"), null);
-  }
+  
 
   lib.addEmployeeATag = ( tag, id, handler) => {
-    //Implementar
-    //Se requiere agregar a un documento un nuevo tag
-    // $push
+    var curatedTags = Array.isArray(tags)? tags: [tags];
+    var updateObject = { "$set": { "tags": curatedTags}};
+    obt.updateOne({"_id": ObjectId(id)}, updateObject, (err, rsult)=>{
+        if(err){
+          handler(err, null);
+        }else{
+          handler(null, rsult.result);
+        }
+    } ); // updateOne
+  } // addTagsToThing
     return handler(new Error("No Implementado"), null);
-  }
+  
 
   lib.removeEmployee = (id, handler) => {
-    //Implementar
-    //Se requiere eliminar un documento de la colección
+    obt.deleteOne({"_id": companyId(Id)}, (err, rslt)=>{
+      if(err){
+        console.log(err);
+        handler(err, null);
+      } else {
+        handler(null, rslt.result);
+      }
+    }); // deleteOne
+  } // deleteById
+
     return handler(new Error("No Implementado"), null);
-  }
+  
 
   lib.increaseAgeToAll = (ageDelta, handler) => {
-    //Implementar
-    //Se requiere modificar todos los documentos de la colección
-    // incrementando age por la cantidad de ageDelta $inc
-    return handler(new Error("No Implementado"), null);
+    var filter = {"_id": ObjectId(id)};
+    // get filered document
+    obt.findOne(filter, (err, doc) => {
+      if(err) {
+        handler(err, null);
+      } else {
+          if(doc){
+              //doc.done = !doc.done;
+              //doc.fcDone = new Date();
+              var updateExpression = {};
+              if(doc.done){
+                  updateExpression = {"$set": {done : false, fcDone:null} };
+              }else{
+                  updateExpression = { "$set": { done: true, fcDone:new Date() } };
+              }
+              obt.updateOne(filter, updateExpression, (err, rslt)=> {
+                  if(err) {
+                    handler(err, null);
+                  }else{
+                    handler(null, rslt.result);
+                  }
+              }); // updateOne
+          }else{
+            handler(new Error("El documento no Existe"), null)
+          }
+      }
+    } );//findOne
   }
+
+    return handler(new Error("No Implementado"), null);
+  
   return lib;
-}
+
 
 module.exports = employeeModel;
